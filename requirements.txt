@@ -1,0 +1,11 @@
+# bot
+py-cord==2.5.0
+aiohttp==3.9.5
+# database
+SQLAlchemy[asyncio]==2.0.30
+asyncpg==0.29.0
+ring==0.10.1
+# aliases
+regex==2024.5.15
+# translations
+i18nice[YAML]==0.15.4
