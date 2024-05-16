@@ -1,0 +1,363 @@
+bot_description: "Someday I will be worthy of the throne..."
+ping_additional_info: "Use `help` command for more information."
+prefixes:
+  zero: "Prefixes:\n```\n%{prefixes}```"
+  one: "Prefixes on this server:\n```\n%{prefixes}```"
+
+permissions:
+  add_reactions: "add reactions"
+  ban_members: "ban members"
+  kick_members: "kick members"
+  manage_guild: "manage guild"
+  manage_messages: "manage messages"
+  manage_roles: "manage roles"
+  read_message_history: "read message history"
+  embed_links: "embed links"
+
+errors:
+  unknown: "An error occurred while processing the command ¯\\_(ツ)_/¯"
+  guild_only: "This command is only for servers."
+  owner_only: "Only bot's owner can use this command."
+  bad_argument: "The command cannot process the specified argument."
+  user_missing_permissions: |
+    You don't have permissions to use this command.
+    (needed permissions: %{permissions})
+  bot_missing_permissions: |
+    %{.bot_forbidden}
+    (needed permissions: %{permissions})
+  message_failed: "Failed to send message with result."
+  unknown_emoji: "Unknown emoji."
+  reaction_limit_reached: "Unable to add reaction (limit reached)."
+  bot_forbidden: "Bot doesn't have permissions to execute this command."
+
+  not_found:
+    user: "User not found."
+    role: "Role not found."
+    channel: "Channel not found."
+    message: "Message not found."
+    emoji: "Couldn't find this emoji."
+
+  user_needs_higher_role: "To manage the role, you need to have a role above this one."
+  bot_needs_higher_role: "The bot cannot manage this role."
+  channel_not_readable: "The bot cannot read message history in %{channel}."
+  not_same_guild: "Message should be from this server."
+
+cant_operate:
+  yourself: "You can't %{action} yourself."
+  itself: "Bot can't %{action} itself."
+  higher_role: "You can't %{action} member with higher role."
+  owner: "You can't %{action} owner."
+  member: "Bot can't %{action} this member."
+
+language:
+  help: "Changes bot's language"
+  usage: "[language]"
+  current: "Current language: English."
+  switched: "Language changed to English."
+  unavailable: |
+    This language is not supported.
+    Available languages: %{languages}
+
+help_command:
+  help: "Help command"
+  usage: "[command [subcommand]]"
+  command_not_found: "Command `%{name}` doesn't exist."
+  subcommand_not_found: "Command `%{command}` doesn't have subcommand `%{subcommand}`"
+  command_list: "Command list"
+  no_description: "stupid bot's creator forgot to write documentation for this command"
+  help_description: "Command description"
+  command_usage: "Usage"
+  command_description: "Description"
+  subcommand: "Subcommand %{name}"
+
+restart:
+  restarting: "Restarting..."
+  restarted: "Bot restarted."
+
+reload:
+  command_not_found: "Command not found."
+  module_not_found: "Module of the command not found."
+  error: "Error: %{error}"
+  success: "Command `%{command}` has been reloaded successfully."
+
+exec:
+  completed_without_output: "Execution completed without output."
+
+status:
+  changed: "Status changed."
+
+upload:
+  uploaded: "File saved as `%{name}`."
+
+alias:
+  help: |
+    Manages aliases
+    Invoke without arguments to see the current list of aliases
+    Use subcommands to add/delete aliases
+    Note: aliases and commands containing spaces must be enclosed in quotes
+    Example: `%{prefix}alias add "repeat $word" "say $word"`
+  list: "Alias list:```\n%{aliases}```"
+  no_aliases: "No aliases on this server."
+  add:
+    help: "Adds alias"
+    usage: "<alias> <command>"
+    already_exists: "Alias `%{alias}` already exists."
+    limit_reached: "A server cannot have more than %{limit} aliases."
+    reject_underscore: "Identifiers starting with an underscore are reserved by the system."
+    reject_duplicates: "Identifiers cannot be repeated."
+    added: "Alias `%{alias}` was added."
+  remove:
+    help: "Deletes alias"
+    usage: "<alias>"
+    removed: "Alias `%{alias}` was removed."
+    not_found: "This alias does not exist."
+  invalid_id: "Invalid identifier: `%{id}`"
+
+autorole:
+  help: |
+    Allows to configure autorole
+    Use subcommands to set or remove autorole
+  current: "Current autorole"
+  not_set: "Not set"
+  set:
+    help: "Sets autorole"
+    usage: "<role>"
+    set: "Autorole was set."
+  remove:
+    help: "Removes autorole"
+    removed: "Autorole was removed."
+  reason: "autorole"
+
+ban:
+  help: |
+    Bans a user
+    If the -d option is specified, deletes the member's messages for <number> days
+  usage: "<user> [reason] [-d <number>]"
+  ban: "ban"
+  invalid_days: "The number of days is incorrect."
+  invalid_days_range: "You can delete messages only for a period from 0 to 7 days."
+  user_banned: "User %{user} was banned."
+
+kick:
+  help: "Kicks a member"
+  usage: "<member> [reason]"
+  kick: "kick"
+  user_kicked: "Member %{user} was kicked."
+
+calc:
+  help: "Calculates a mathematical expression"
+  usage: "<expression>"
+  error: "An error occurred while trying to contact the server."
+  result: "Calculation result"
+
+choose:
+  help: |
+    Chooses from multiple options
+    Note: the owner of the bot is not responsible for the impact of the answer on your life
+  usage: "<variant1/variant2/...>"
+  answer: '%{user}, I choose "%{answer}"'
+
+clean:
+  help: >
+    Cleans up messages
+
+    Enter the number and user whose messages you want to delete
+    (by default, messages of all users are deleted)
+
+    The `-s` option suppresses the output of the number of deleted messages
+  usage: "<number> [user] [reason] [-s]"
+  missing_permissions: "You do not have permissions to delete messages."
+  messages_deleted: "Deleted %{count} message%{p(|s)}."
+
+convert:
+  help: |
+    Converts numbers
+    From one number system to another
+    Example: `%{prefix}convert 113 10 2`
+  usage: "<number> <input number system> <output number system>"
+  invalid_sys_comment: "(expected number between %{min} and %{max})"
+  invalid_from_sys: |
+    Incorrect input number system specified.
+    %{.invalid_sys_comment}
+  invalid_to_sys: |
+    Incorrect output number system specified.
+    %{.invalid_sys_comment}
+  invalid_number: "The number cannot be deciphered in the specified input number system."
+  result_title: "Conversion of number %{number} from %{from_sys} to %{to_sys}"
+
+emoji:
+  help: "Sends emoji"
+  usage: "<emoji, name or id>"
+
+get_emoji:
+  help: "Sends emoji as file"
+
+invite:
+  help: >
+    Sends invitation link
+
+    Sends a link with which you can add the bot to your server,
+    as well as a link to the bot owner's server
+  invites: "Invites"
+  description: "Links for invitation and feedback"
+  bot_link: "Bot invitation link"
+  server_link: "Developer's server"
+
+layout:
+  help: "Changes text layout"
+  usage: "[text]"
+  missing_text: "Specify the text or reply to a text message."
+  title: "Layout change"
+
+poll:
+  help: |
+    Voting
+    The first line of the message is the subject of the voting
+    If additional lines are specified, the bot will try to add the reactions they start with
+    If the text is one line, the bot will add thumbs up and down
+  usage: &text_arg "<text>"
+
+prefix:
+  help: |
+    Prefix management
+    (see description of subcommands)
+  usage: "[add/remove prefix]"
+  add:
+    help: "Adds prefix"
+    usage: &prefix_arg "<prefix>"
+    too_long: "This prefix is too long."
+    already_exists: "Prefix `%{prefix}` is already in use."
+    limit_reached: "There cannot be more than %{limit} prefixes on the server."
+    added: "Added new prefix: `%{prefix}`"
+  remove:
+    help: "Removes prefix"
+    usage: *prefix_arg
+    no_prefixes: "There are no custom prefixes on this server."
+    not_found: "Prefix `%{prefix}` doesn't exist."
+    removed: "Prefix `%{prefix}` is no longer used."
+
+react:
+  help: |
+    Adds reaction
+    You can reply to the message to which you want to add a reaction or specify the id
+  usage: "<emoji> [message id]"
+  no_perms: "You can't add reactions in this channel."
+
+reactionrole:
+  help: "Configures reaction roles"
+  add:
+    help: "Adds reaction role"
+    usage: "<message link> <emoji> <role>"
+    already_taken: "The reaction is already bound to the message."
+    missing_reaction_perms: "The bot does not have permissions to add the reaction."
+    added: "New reaction role was added"
+    comment: "React with %{reaction} to [message](%{url}) to obtain %{role}"
+  list:
+    help: "Displays the entire list of reaction roles on the server"
+    item: "[Jump to message](%{url}), %{reaction}: %{role}"
+    title: "Reaction roles"
+    empty: "No reaction roles."
+  remove:
+    help: "Removes reaction role"
+    usage: "<message link> <reaction>"
+    removed: "Reaction role was removed."
+    not_found: "The specified reaction is not bound to the specified message."
+  reason: "reaction role"
+
+remind:
+  help: |
+    Sets a reminder
+    After the time you specified, a reminder will be sent to the channel in which the command was invoked
+    Examples:
+    `%{prefix}remind 2 hours 30 minutes check mail`
+    `%{prefix}remind 3 days new episode released`
+    `%{prefix}remind 2024-06-30 08:00 International Sailor Moon Day`
+    Reminder sending time can vary within a minute
+  usage: "<time> <reminder>"
+  invalid_args: "The time is incorrect or reminder is not provided."
+  max_length_reached: "The maximum reminder length is %{limit} characters."
+  created: "The reminder is set and will be sent to this channel %{time}."
+  list:
+    help: "Lists all your reminders in this channel"
+    title: "Reminders"
+    empty: "Reminders not set"
+  remove:
+    help: "Deletes reminder"
+    usage: "<number>"
+    invalid_number: "There is no reminder with this number."
+    removed: 'The reminder "%{reminder}" was removed.'
+  clear:
+    help: "Clears all your reminders in this channel"
+    ask: |
+      Really remove all reminders from this channel?
+      Write "%{.confirm}" to confirm.
+    confirm: "CONFIRM"
+    cancelled: "Cancelled."
+    cleared: "All your reminders in this channel were cleared."
+  message: "%{user}, you've set a reminder:\n> %{subject}"
+
+say:
+  help: "Says text"
+  usage: *text_arg
+
+server:
+  help: "Displays server information"
+  description: "Server information"
+  id: &id "id"
+  created: "server created"
+  created_ago: &created_ago "%{time} (%{count} %{p(day|days)} ago)"
+  owner: "owner"
+  member_count: "member count"
+
+tictac:
+  help: |
+    Tic Tac Toe
+    To make a move, enter the coordinates in the format `<row> <column>`
+  usage: "@opponent [additional players] [field size [length to win]]"
+  already_playing: "The game is already active in this channel!"
+  missing_opponent: "You must mention the opponent."
+  negative_specs: "The size of the field and the winning row must be positive numbers."
+  field_too_big: "The maximum field size is %{limit} by %{limit}."
+  line_too_big: "The length of the winning row cannot exceed the size of the field."
+  too_many_gamers: "You have entered too many players."
+  game_started: "The game has begun!"
+  stop:
+    help: "Stops the game"
+    cant_stop: "You cannot stop a game you don't participate in."
+    stopped: "The game was stopped."
+  current_player: "Current move: %{player}"
+  winner: "Winner: %{winner}"
+  draw: "Draw."
+  stats:
+    help: |
+      Player winning statistics
+      Only games with "fair" conditions count
+    usage: &user_arg "[user]"
+    stats: |
+      Statistics for: %{user}
+      Games played: %{total}
+      Wins: %{won} (%{percent}%%)
+
+user:
+  help: &user_info "User information"
+  usage: *user_arg
+  user: *user_info
+  bot: "Bot information"
+  id: *id
+  created: "account created"
+  created_ago: *created_ago
+  joined: "member joined"
+  joined_ago: *created_ago
+
+avatar:
+  help: "User avatar"
+  usage: *user_arg
+
+banner:
+  help: "User banner and profile color"
+  usage: *user_arg
+  banner: "Banner of %{user}:\n%{url}"
+  absent: "User %{user} doesn't have a banner."
+  profile_color:
+    zero: "Profile color not specified."
+    one: "Profile color: %{color}"
