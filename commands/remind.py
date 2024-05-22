@@ -201,7 +201,7 @@ class Remind(commands.Cog):
         try:
             await target.send(
                 t(
-                    "remind_message",
+                    "remind.message",
                     language,
                     user=f"<@{user_id}>",
                     subject=subject,
