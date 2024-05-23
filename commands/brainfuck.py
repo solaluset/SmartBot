@@ -21,7 +21,11 @@ async def brainfuck(ctx, *, code: str):
     except BFException as e:
         await ctx.send(t("brainfuck.error", ctx.language, error=e))
     else:
-        await ctx.send(t("brainfuck.result", ctx.language, result=state.output.decode()))
+        result = state.output.decode()
+        if result:
+            await ctx.send(t("brainfuck.result", ctx.language, result=result))
+        else:
+            await ctx.send(t("exec.completed_without_output", ctx.language))
 
 
 def setup(bot):
