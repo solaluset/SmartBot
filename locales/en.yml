@@ -138,6 +138,24 @@ ban:
   invalid_days_range: "You can delete messages only for a period from 0 to 7 days."
   user_banned: "User %{user} was banned."
 
+brainfuck:
+  help: |
+    Runs Brainfuck code
+    Example: %{prefix}bf \`\`\`bf
+    >++++++[->++++++++<],<,,>>[-<-<->>>+<]<[-<+>]>>[-<<<+>>>]<<<.
+    \`\`\`
+    1 2
+  usage: "<code> [input]"
+  result: |
+    Result: ```
+    %{result}
+    ```
+  error: |
+    Error: ```
+    %{error}
+    ```
+
+
 kick:
   help: "Kicks a member"
   usage: "<member> [reason]"
