@@ -30,6 +30,7 @@ bot.load_extensions(
     "alias",
     "autorole",
     "ban",
+    "brainfuck",
     "calc",
     "choose",
     "clean",
