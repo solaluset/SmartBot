@@ -19,9 +19,9 @@ async def brainfuck(ctx, *, code: str):
     try:
         state.interpret(parse(code))
     except BFException as e:
-        await ctx.send(t("brainfuck.error", error=e))
+        await ctx.send(t("brainfuck.error", ctx.language, error=e))
     else:
-        await ctx.send(t("brainfuck.result", result=state.output.decode()))
+        await ctx.send(t("brainfuck.result", ctx.language, result=state.output.decode()))
 
 
 def setup(bot):
