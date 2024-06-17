@@ -8,4 +8,4 @@ ring==0.10.1
 # aliases
 regex==2024.5.15
 # translations
-i18nice[YAML]==0.15.4
+i18nice[YAML]==0.15.5
