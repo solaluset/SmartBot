@@ -129,7 +129,7 @@ class TicTacToe:
 
     def signature_str(self) -> str:
         if self.stopped:
-            return t("tictac.stopped", self.language)
+            return t("tictac.stop.stopped", self.language)
         elif self.winner is None:
             return t(
                 "tictac.current_player",
