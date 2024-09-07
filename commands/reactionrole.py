@@ -19,7 +19,7 @@ from modules.SmartBot import (
 
 
 rr_table = WrappedTable(
-    "reaction_role",
+    "reaction_roles",
     None,
     Column("guild_id", String(25), nullable=False),
     Column("channel_id", String(25), nullable=False),
