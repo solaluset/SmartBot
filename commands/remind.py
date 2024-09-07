@@ -16,8 +16,8 @@ from modules.timeparse import TIMEFORMATS, timeparse
 
 
 MAX_REMINDER_LEN = 1000
-remind_table = WrappedTable(
-    "remind",
+reminders_table = WrappedTable(
+    "reminders",
     None,
     Column("requester_id", String(25), nullable=False),
     Column("channel_id", String(25), nullable=False),
@@ -31,7 +31,7 @@ PATTERNS.append(re.compile(QUOTED_PATTERN))
 class Remind(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.data = remind_table
+        self.data = reminders_table
         self.data.engine = bot.sql
         self.sender_loop.start()
 
