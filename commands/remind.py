@@ -45,8 +45,11 @@ class Remind(commands.Cog):
             rest = parts.pop()
         else:
             rest = ""
+        time = " ".join(parts)
+        if "+" in time and ":" not in time.split("+")[-1]:
+            time += ":00"
         try:
-            return datetime.fromisoformat(" ".join(parts)).timestamp(), rest
+            return datetime.fromisoformat(time).timestamp(), rest
         except ValueError:
             return None
 
