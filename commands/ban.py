@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord.utils import escape_markdown
 
-from modules import permissions
+from modules import permissions, timeparse
 from modules.i18n import t
 
 
@@ -29,7 +29,9 @@ async def ban(ctx, user: discord.User, *, reason: str | None = None):
         days = 0
     if days < 0 or days > 7:
         return await ctx.send(t("ban.invalid_days_range", ctx.language))
-    await ctx.guild.ban(user, reason=reason, delete_message_days=days)
+    await ctx.guild.ban(
+        user, reason=reason, delete_message_seconds=days * timeparse.MULTIPLIERS["days"]
+    )
     await ctx.send(t("ban.user_banned", ctx.language, user=escape_markdown(str(user))))
 
 
