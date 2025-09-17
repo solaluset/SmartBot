@@ -1,3 +1,5 @@
+from functools import partial
+
 from discord import Embed as BaseEmbed, Color
 
 
@@ -12,13 +14,19 @@ class Embed(BaseEmbed):
         if not self.color:
             self.color = ctx.me.color if ctx.me.color.value else Color.dark_theme()
 
-    async def send(self, dest=None):
+    async def send(self, dest=None, *, ephemeral: bool = False):
         dest = dest or self.ctx
         channel = getattr(dest, "channel", dest)
-        if channel.permissions_for(self.ctx.me).embed_links:
-            return await dest.send(embed=self)
+        if hasattr(dest, "respond"):
+            method = partial(dest.respond, ephemeral=ephemeral)
         else:
-            return await dest.send(self)
+            if ephemeral:
+                raise TypeError(f"{dest} does not support ephemeral messages")
+            method = dest.send
+        if channel.permissions_for(self.ctx.me).embed_links:
+            return await method(embed=self)
+        else:
+            return await method(self)
 
     def __str__(self) -> str:
         text = ""

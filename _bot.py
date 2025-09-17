@@ -56,5 +56,9 @@ bot.load_extensions(
 
 if __name__ == "__main__":
     log.info("Connecting...")
-    bot.run()
+    try:
+        bot.run()
+    except RuntimeError as e:
+        if e.args != ("Session is closed",):
+            raise
     log.info("Stopped.")

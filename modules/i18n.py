@@ -1,4 +1,4 @@
-__all__ = ("AVAILABLE_LANGUAGES", "init", "t")
+__all__ = ("AVAILABLE_LANGUAGES", "init", "t", "generate_name_localizations")
 
 import os
 import logging as log
@@ -39,3 +39,10 @@ def plural_uk(*args: str, count: int, **kwargs) -> str:
 
 def plural_en(*args: str, count: int, **kwargs) -> str:
     return args[abs(count) != 1]
+
+
+def generate_name_localizations(key: str) -> dict[str, str]:
+    localizations = {locale: t(key, locale) for locale in AVAILABLE_LANGUAGES}
+    localizations["en-GB"] = localizations["en-US"] = localizations.pop("en")
+
+    return localizations
