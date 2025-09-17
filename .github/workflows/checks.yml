@@ -1,5 +1,11 @@
 name: Code checks
-on: [push, pull_request]
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
 jobs:
   run-checks:
     runs-on: ubuntu-latest
