@@ -25,7 +25,10 @@ class Embed(BaseEmbed):
             if ephemeral:
                 raise TypeError(f"{dest} does not support ephemeral messages")
             method = dest.send
-        if channel.permissions_for(self.ctx.me).embed_links:
+        if (
+            not hasattr(channel, "permissions_for")
+            or channel.permissions_for(self.ctx.me).embed_links
+        ):
             return await method(embed=self)
         else:
             return await method(self)
