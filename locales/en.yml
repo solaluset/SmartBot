@@ -224,7 +224,7 @@ invite:
 layout:
   help: "Changes text layout"
   usage: "[text]"
-  missing_text: "Specify the text or reply to a text message."
+  missing_text: "Cannot find the text."
   title: "Layout change"
 
 poll:

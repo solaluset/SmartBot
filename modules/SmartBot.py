@@ -246,6 +246,14 @@ class SmartBot(commands.Bot):
         ctx.language = await self.get_language(message.guild)
         return ctx
 
+    async def get_application_context(self, interaction, *, cls=None):
+        kwargs = {}
+        if cls is not None:
+            kwargs["cls"] = cls
+        ctx = await super().get_application_context(interaction, **kwargs)
+        ctx.language = await self.get_language(interaction.guild)
+        return ctx
+
     async def get_guild_property(self, guild: Guild, prop: str):
         res = await self.guilds_data.select(prop, guild_id=str(guild.id))
         if res:
