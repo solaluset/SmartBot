@@ -12,7 +12,9 @@ class Embed(BaseEmbed):
         self.ctx = ctx
         super().__init__(**kwargs)
         if not self.color:
-            self.color = ctx.me.color if ctx.me.color.value else Color.dark_theme()
+            self.color = (
+                ctx.me.color if ctx.me and ctx.me.color.value else Color.dark_theme()
+            )
 
     async def send(self, dest=None, *, ephemeral: bool = False):
         dest = dest or self.ctx
