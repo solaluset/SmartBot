@@ -13,6 +13,10 @@ async def _text_from_message(message: discord.Message | discord.ForwardedMessage
     if message.content or isinstance(message, discord.ForwardedMessage):
         return message.content
 
+    return await _text_from_referenced_message(message)
+
+
+async def _text_from_referenced_message(message: discord.Message) -> str:
     if message.snapshots:
         return await _text_from_message(message.snapshots[0].message)
 
@@ -32,7 +36,7 @@ async def layout(ctx, *, text: str | None = None):
     "layout.help"
     if not text:
         try:
-            text = await _text_from_message(ctx.message)
+            text = await _text_from_referenced_message(ctx.message)
         except discord.NotFound:
             return await ctx.send(t("errors.not_found.message", ctx.language))
     if not text:
