@@ -94,7 +94,9 @@ class TicTacToe:
             self.turn_of = 0
         if self.use_ai and self.message.author.mention == self.gamers[self.turn_of]:
             return self._update(
-                *Scores(self.table, self.to_win).get_move(self.signs[self.turn_of])
+                *Scores(self.table, self.to_win, self.get_ephemeral()).get_move(
+                    self.signs[self.turn_of]
+                )
             )
         return True
 
@@ -117,6 +119,13 @@ class TicTacToe:
         if self.winner is None:
             self.stopped = True
 
+    def get_ephemeral(self) -> list[tuple[int, int]]:
+        if self.ephemeral_threshold:
+            missing = self.ephemeral_threshold - len(self.move_history)
+            if missing < len(self.gamers):
+                return self.move_history[: len(self.gamers) - missing]
+        return []
+
     def __str__(self):
         return (
             " vs ".join(self.gamers)
@@ -134,14 +143,7 @@ class TicTacToe:
             + " ".join(ascii_uppercase[: len(self.table)])
             + "\n"
         )
-        if self.ephemeral_threshold:
-            missing = self.ephemeral_threshold - len(self.move_history)
-            if missing < len(self.gamers):
-                ephemeral = self.move_history[: len(self.gamers) - missing]
-            else:
-                ephemeral = []
-        else:
-            ephemeral = []
+        ephemeral = self.get_ephemeral()
         for i, row in enumerate(self.table):
             text += (
                 str(i + 1).ljust(max_len)
