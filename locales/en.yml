@@ -331,7 +331,7 @@ tictac:
   help: |
     Tic Tac Toe
     To make a move, enter the coordinates in the format `<row> <column>`
-  usage: "@opponent [additional players] [field size [length to win]]"
+  usage: "@opponent [additional players] [field size [length to win [point limit]]]"
   already_playing: "The game is already active in this channel!"
   missing_opponent: "You must mention the opponent."
   negative_specs: "The size of the field and the winning row must be positive numbers."
