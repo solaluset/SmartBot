@@ -2,17 +2,21 @@ from itertools import chain
 from typing import Iterable
 
 TableT = list[list[str]]
+EphemeralT = list[tuple[int, int]]
 EMPTY = "_"
 
 
 class MaxScoreBase:
-    def __init__(self, table: TableT, to_win: int, x: int, y: int):
+    def __init__(
+        self, table: TableT, to_win: int, x: int, y: int, ephemeral: EphemeralT
+    ):
         self.table = table
         self.to_win = to_win
         self.score = 0
         self.start_x = self.end_x = x
         self.start_y = self.end_y = y
         self.symbol = EMPTY
+        self.ephemeral = ephemeral
         self.has_space_before, self.has_space_after = False, False
 
     def next(self, x: int, y: int) -> tuple[int, int]:
@@ -63,6 +67,8 @@ class MaxScoreBase:
             symbol = EMPTY
             score = 0
             for i, j in self.iter_cells():
+                if (i, j) in self.ephemeral:
+                    continue
                 cell = self.table[i][j]
                 if cell != EMPTY:
                     if symbol == EMPTY:
@@ -122,21 +128,36 @@ class MaxScoreDiag2(MaxScoreBase):
 
 
 class Scores:
-    def __init__(self, table: TableT, to_win: int):
+    def __init__(self, table: TableT, to_win: int, ephemeral: EphemeralT = []):
         self.table = table
         self.to_win = to_win
+        self.ephemeral = ephemeral
         self.search()
 
     def search(self):
         size = len(self.table)
-        self.rows = [MaxScoreRow(self.table, self.to_win, x, 0) for x in range(size)]
-        self.cols = [MaxScoreCol(self.table, self.to_win, 0, y) for y in range(size)]
+        self.rows = [
+            MaxScoreRow(self.table, self.to_win, x, 0, self.ephemeral)
+            for x in range(size)
+        ]
+        self.cols = [
+            MaxScoreCol(self.table, self.to_win, 0, y, self.ephemeral)
+            for y in range(size)
+        ]
         self.diags1 = [
-            MaxScoreDiag1(self.table, self.to_win, 0, y) for y in range(size)
-        ] + [MaxScoreDiag1(self.table, self.to_win, x, 0) for x in range(1, size)]
+            MaxScoreDiag1(self.table, self.to_win, 0, y, self.ephemeral)
+            for y in range(size)
+        ] + [
+            MaxScoreDiag1(self.table, self.to_win, x, 0, self.ephemeral)
+            for x in range(1, size)
+        ]
         self.diags2 = [
-            MaxScoreDiag2(self.table, self.to_win, 0, y) for y in range(size)
-        ] + [MaxScoreDiag2(self.table, self.to_win, x, size - 1) for x in range(1, size)]
+            MaxScoreDiag2(self.table, self.to_win, 0, y, self.ephemeral)
+            for y in range(size)
+        ] + [
+            MaxScoreDiag2(self.table, self.to_win, x, size - 1, self.ephemeral)
+            for x in range(1, size)
+        ]
 
         for s in self:
             s.search()
