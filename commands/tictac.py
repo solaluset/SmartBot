@@ -31,7 +31,7 @@ class TicTac(commands.Cog):
 
     @commands.group(
         usage="tictac.usage",
-        aliases=("tictactoe",),
+        aliases=("tictactoe", "ttt"),
         invoke_without_command=True,
     )
     async def tictac(
