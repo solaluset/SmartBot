@@ -16,6 +16,7 @@ for redef_sign in reversed(("x", "o")):
 del redef_sign
 SIGNS = tuple(SIGNS)
 MAX_GAMERS = len(SIGNS)
+EPHEMERENESS_SYMBOL = "\u036f"
 
 
 class TicTacToe:
@@ -27,6 +28,7 @@ class TicTacToe:
         *gamers: str,
         use_ai=False,
         language="en",
+        ephemeral_threshold=0,
     ):
         self.message = message
         self.gamers = gamers
@@ -41,6 +43,8 @@ class TicTacToe:
         for _ in range(1, size):
             self.table.append(self.table[0].copy())
         self.to_win = combo_to_win
+        self.move_history = []
+        self.ephemeral_threshold = ephemeral_threshold * len(self.gamers)
         self.stopped = False
 
     async def resend(self):
@@ -71,7 +75,14 @@ class TicTacToe:
     def _update(self, x: int, y: int) -> bool:
         if self.table[x][y] != EMPTY:
             return False
+        if (
+            self.ephemeral_threshold
+            and len(self.move_history) == self.ephemeral_threshold
+        ):
+            ephemeral = self.move_history.pop(0)
+            self.table[ephemeral[0]][ephemeral[1]] = EMPTY
         self.table[x][y] = self.signs[self.turn_of]
+        self.move_history.append((x, y))
         if self.check_win():
             self.winner = self.gamers[self.turn_of]
             return True
@@ -123,8 +134,23 @@ class TicTacToe:
             + " ".join(ascii_uppercase[: len(self.table)])
             + "\n"
         )
-        for i, row in enumerate(self.table, 1):
-            text += str(i).ljust(max_len) + " ".join(row) + "\n"
+        if self.ephemeral_threshold:
+            missing = self.ephemeral_threshold - len(self.move_history)
+            if missing < len(self.gamers):
+                ephemeral = self.move_history[: len(self.gamers) - missing]
+            else:
+                ephemeral = []
+        else:
+            ephemeral = []
+        for i, row in enumerate(self.table):
+            text += (
+                str(i + 1).ljust(max_len)
+                + " ".join(
+                    x + EPHEMERENESS_SYMBOL if (i, j) in ephemeral else x
+                    for j, x in enumerate(row)
+                )
+                + "\n"
+            )
         return text + "```"
 
     def signature_str(self) -> str:
