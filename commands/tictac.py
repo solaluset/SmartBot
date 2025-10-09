@@ -40,6 +40,7 @@ class TicTac(commands.Cog):
         gamers: commands.Greedy[User],
         size: int = 3,
         combo: int = 3,
+        ephemeral_threshold: int = 0,
     ):
         "tictac.help"
         curr_sess = self.tictac_sessions.get(ctx.channel.id, None)
@@ -72,6 +73,7 @@ class TicTac(commands.Cog):
             *gamers,
             use_ai=use_ai,
             language=ctx.language,
+            ephemeral_threshold=max(0, ephemeral_threshold),
         )
 
         self.tictac_sessions[ctx.channel.id] = curr_sess
