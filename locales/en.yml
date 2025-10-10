@@ -335,6 +335,7 @@ tictac:
   already_playing: "The game is already active in this channel!"
   missing_opponent: "You must mention the opponent."
   negative_specs: "The size of the field and the winning row must be positive numbers."
+  message-too-big: "Field is too big."
   field_too_big: "The maximum field size is %{limit} by %{limit}."
   line_too_big: "The length of the winning row cannot exceed the size of the field."
   too_many_gamers: "You have entered too many players."
@@ -346,6 +347,8 @@ tictac:
   current_player: "Current move: %{player}%{additional_info}"
   winner: "Winner: %{winner}"
   draw: "Draw."
+  main-board: "Main board:"
+  full-board: "Full board:"
   selected_subboard: " (current subboard: %{subboard})"
   subboard_not_selected: " (choose subboard)"
   stats:

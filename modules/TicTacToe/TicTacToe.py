@@ -143,6 +143,7 @@ class TicTacToe:
         return (
             " vs ".join(self.gamers)
             + "\n"
+            + self.prefix_str()
             + self._codeblock(self.table_str())
             + "\n"
             + self.signature_str()
@@ -181,6 +182,9 @@ class TicTacToe:
             return t("tictac.winner", self.language, winner=self.winner)
         else:
             return t("tictac.draw", self.language)
+
+    def prefix_str(self) -> str:
+        return ""
 
     def additional_str(self) -> str:
         return ""
@@ -278,6 +282,16 @@ class UltimateTicTacToe(TicTacToe):
         width = len(first_line)
 
         return f"\n{ '-' * width }\n".join(rows) + "\n"
+
+    def prefix_str(self) -> str:
+        return (
+            t("tictac.main-board", self.language)
+            + "\n"
+            + self._codeblock(super().table_str())
+            + "\n"
+            + t("tictac.full-board", self.language)
+            + "\n"
+        )
 
     def additional_str(self) -> str:
         return (
