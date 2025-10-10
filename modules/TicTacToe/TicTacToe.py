@@ -188,6 +188,7 @@ class TicTacToe:
 
 class UltimateTicTacToe(TicTacToe):
     def __init__(self, *args, **kwargs):
+        kwargs["use_ai"] = False
         super().__init__(*args, **kwargs)
         self._ttt_factory = lambda: TicTacToe(*args, **kwargs)
         self.subboards = [
