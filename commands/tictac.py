@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import insert
 from modules.i18n import t
 from modules.regexps import ID
 from modules.db import WrappedTable
-from modules.TicTacToe import MAX_FIELD_SIZE, MAX_GAMERS, TicTacToe
+from modules.TicTacToe import MAX_FIELD_SIZE, MAX_GAMERS, TicTacToe, UltimateTicTacToe
 from modules.converters import SmartUserConverter
 
 
@@ -41,6 +41,7 @@ class TicTac(commands.Cog):
         size: int = 3,
         combo: int = 3,
         ephemeral_threshold: int = 0,
+        mode: str = "",
     ):
         "tictac.help"
         curr_sess = self.tictac_sessions.get(ctx.channel.id, None)
@@ -66,7 +67,7 @@ class TicTac(commands.Cog):
             await ctx.send(t("tictac.too_many_gamers", ctx.language))
             return
 
-        curr_sess = TicTacToe(
+        curr_sess = (UltimateTicTacToe if mode == "ULTIMATE" else TicTacToe)(
             await ctx.send(t("tictac.game_started", ctx.language)),
             size,
             combo,
