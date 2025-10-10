@@ -1,10 +1,12 @@
 from modules import i18n
-from . import TicTacToe
+from . import TicTacToe, UltimateTicTacToe
 
 
 i18n.init()
 
-t = TicTacToe(None, 3, 3, "me", "you", ephemeral_threshold=3)
+TicTacToe
+
+t = UltimateTicTacToe(None, 2, 2, "me", "you", ephemeral_threshold=1)
 
 while t.winner is None:
     print(t)

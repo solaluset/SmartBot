@@ -342,9 +342,11 @@ tictac:
     help: "Зупиняє гру"
     cant_stop: "Ви не можете зупинити гру, в якій не берете участь."
     stopped: "Гру було зупинено."
-  current_player: "Зараз ходить: %{player}"
+  current_player: "Зараз ходить: %{player}%{additional_info}"
   winner: "Переможець: %{winner}"
   draw: "Нічия."
+  selected_subboard: " (обраний сегмент: %{subboard})"
+  subboard_not_selected: " (оберіть сегмент)"
   stats:
     help: |
       Статистика перемог гравця

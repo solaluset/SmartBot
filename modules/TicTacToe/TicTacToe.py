@@ -51,9 +51,9 @@ class TicTacToe:
         await self.message.delete()
         self.message = await self.message.channel.send(self)
 
-    def update(self, user_input: str) -> bool:
+    def _parse_cell(self, user_input: str) -> tuple[int, int] | None:
         if not user_input:
-            return False
+            return None
         user_input = user_input.replace("-", "").replace(" ", "").upper()
         if user_input[0] in ascii_uppercase:
             letter = user_input[0]
@@ -62,15 +62,21 @@ class TicTacToe:
             letter = user_input[-1]
             user_input = user_input[:-1]
         else:
-            return False
+            return None
         try:
             number = int(user_input) - 1
         except ValueError:
-            return False
+            return None
         letter = ord(letter) - ord("A")
         if letter >= len(self.table) or number not in range(len(self.table)):
+            return None
+        return number, letter
+
+    def update(self, user_input: str) -> bool:
+        coords = self._parse_cell(user_input)
+        if coords is None:
             return False
-        return self._update(number, letter)
+        return self._update(coords[0], coords[1])
 
     def _update(self, x: int, y: int) -> bool:
         if self.table[x][y] != EMPTY:
@@ -80,7 +86,7 @@ class TicTacToe:
             and len(self.move_history) == self.ephemeral_threshold
         ):
             ephemeral = self.move_history.pop(0)
-            self.table[ephemeral[0]][ephemeral[1]] = EMPTY
+            self._handle_ephemereness(ephemeral[0], ephemeral[1])
         self.table[x][y] = self.signs[self.turn_of]
         self.move_history.append((x, y))
         if self.check_win():
@@ -99,6 +105,9 @@ class TicTacToe:
                 )
             )
         return True
+
+    def _handle_ephemereness(self, x: int, y: int) -> None:
+        self.table[x][y] = EMPTY
 
     def check_draw(self) -> bool:
         for i in self.table:
@@ -130,19 +139,18 @@ class TicTacToe:
         return (
             " vs ".join(self.gamers)
             + "\n"
-            + self.table_str()
+            + self._codeblock(self.table_str())
             + "\n"
             + self.signature_str()
         )
 
+    @staticmethod
+    def _codeblock(string: str) -> str:
+        return f"```\n\u200b{string}```"
+
     def table_str(self) -> str:
         max_len = len(str(len(self.table))) + 1
-        text = (
-            "```\n\u200b"
-            + " " * max_len
-            + " ".join(ascii_uppercase[: len(self.table)])
-            + "\n"
-        )
+        text = " " * max_len + " ".join(ascii_uppercase[: len(self.table)]) + "\n"
         ephemeral = self.get_ephemeral()
         for i, row in enumerate(self.table):
             text += (
@@ -153,7 +161,7 @@ class TicTacToe:
                 )
                 + "\n"
             )
-        return text + "```"
+        return text
 
     def signature_str(self) -> str:
         if self.stopped:
@@ -163,8 +171,117 @@ class TicTacToe:
                 "tictac.current_player",
                 self.language,
                 player=self.gamers[self.turn_of],
+                additional_info=self.additional_str(),
             )
         elif self.winner:
             return t("tictac.winner", self.language, winner=self.winner)
         else:
             return t("tictac.draw", self.language)
+
+    def additional_str(self) -> str:
+        return ""
+
+
+class UltimateTicTacToe(TicTacToe):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._ttt_factory = lambda: TicTacToe(*args, **kwargs)
+        self.subboards = [
+            [self._ttt_factory() for _ in range(len(self.table))]
+            for _ in range(len(self.table))
+        ]
+        self.selected_subboard_x = None
+        self.selected_subboard_y = None
+
+    def get_selected_subboard(self) -> TicTacToe | None:
+        if self.selected_subboard_x is None:
+            return None
+        return self.subboards[self.selected_subboard_x][self.selected_subboard_y]
+
+    def select_subboard(self, x: int | None, y: int | None) -> None:
+        self.selected_subboard_x = x
+        self.selected_subboard_y = y
+
+    def update(self, user_input: str) -> bool:
+        subboard = self.get_selected_subboard()
+        subboard_changed = False
+        if not subboard:
+            parts = user_input.split()
+            if 1 <= len(parts) <= 2:
+                coords = self._parse_cell(parts.pop(0))
+                if coords is None:
+                    return False
+                self.select_subboard(coords[0], coords[1])
+                subboard = self.get_selected_subboard()
+                subboard_changed = True
+                if subboard.winner is not None:
+                    self.select_subboard(None, None)
+                    return False
+                if not parts:
+                    return True
+                user_input = parts[0]
+
+        coords = self._parse_cell(user_input)
+        if coords is None:
+            return subboard_changed
+        subboard.turn_of = self.turn_of
+        x, y = coords
+        if not subboard._update(x, y):
+            return subboard_changed
+        if subboard.winner is not None:
+            self._update(self.selected_subboard_x, self.selected_subboard_y)
+        else:
+            self.turn_of = subboard.turn_of
+        self.select_subboard(x, y)
+        if self.get_selected_subboard().winner is not None:
+            self.select_subboard(None, None)
+        return True
+
+    def _handle_ephemereness(self, x: int, y: int) -> None:
+        super()._handle_ephemereness(x, y)
+        self.subboards[x][y] = self._ttt_factory()
+
+    @staticmethod
+    def _maybe_ephemeral(text: str, ephemeral: bool) -> str:
+        if not ephemeral:
+            return text
+        return "".join(c if c.isspace() else c + EPHEMERENESS_SYMBOL for c in text)
+
+    def table_str(self) -> str:
+        ephemeral = self.get_ephemeral()
+        rows = []
+        for i, subrow in enumerate(self.subboards):
+            row_lines = []
+            original_lines = [
+                self._maybe_ephemeral(
+                    board.table_str(), (i, j) in ephemeral
+                ).splitlines()
+                for j, board in enumerate(subrow)
+            ]
+            original_lines.insert(0, f"{i + 1 :^{len(original_lines[0])}}")
+            for lines in zip(*original_lines):
+                row_lines.append(" | ".join(lines))
+            rows.append("\n".join(row_lines))
+        first_line = rows[0].split("\n", 1)[0]
+        rows.insert(
+            0,
+            "|".join(
+                f"{ascii_uppercase[i] if i >= 0 else ' ' :^{len(part)}}"
+                for i, part in enumerate(first_line.split("|"), -1)
+            ),
+        )
+        width = len(first_line)
+
+        return f"\n{ '-' * width }\n".join(rows) + "\n"
+
+    def additional_str(self) -> str:
+        return (
+            t(
+                "tictac.selected_subboard",
+                self.language,
+                subboard=ascii_uppercase[self.selected_subboard_y]
+                + str(self.selected_subboard_x + 1),
+            )
+            if self.selected_subboard_x is not None
+            else t("tictac.subboard_not_selected", self.language)
+        )
