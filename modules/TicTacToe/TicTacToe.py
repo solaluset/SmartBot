@@ -1,3 +1,4 @@
+from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
 from typing import TYPE_CHECKING
 
@@ -43,8 +44,8 @@ class TicTacToe:
         for _ in range(1, size):
             self.table.append(self.table[0].copy())
         self.to_win = combo_to_win
-        self.move_history = []
-        self.ephemeral_threshold = ephemeral_threshold * len(self.gamers)
+        self.move_history = defaultdict(list)
+        self.ephemeral_threshold = ephemeral_threshold
         self.stopped = False
 
     async def resend(self):
@@ -81,14 +82,15 @@ class TicTacToe:
     def _update(self, x: int, y: int) -> bool:
         if self.table[x][y] != EMPTY:
             return False
+        sign = self.signs[self.turn_of]
         if (
             self.ephemeral_threshold
-            and len(self.move_history) == self.ephemeral_threshold
+            and len(self.move_history[sign]) == self.ephemeral_threshold
         ):
-            ephemeral = self.move_history.pop(0)
+            ephemeral = self.move_history[sign].pop(0)
             self._handle_ephemereness(ephemeral[0], ephemeral[1])
-        self.table[x][y] = self.signs[self.turn_of]
-        self.move_history.append((x, y))
+        self.table[x][y] = sign
+        self.move_history[sign].append((x, y))
         if self.check_win():
             self.winner = self.gamers[self.turn_of]
             return True
@@ -130,9 +132,11 @@ class TicTacToe:
 
     def get_ephemeral(self) -> list[tuple[int, int]]:
         if self.ephemeral_threshold:
-            missing = self.ephemeral_threshold - len(self.move_history)
-            if missing < len(self.gamers):
-                return self.move_history[: len(self.gamers) - missing]
+            return [
+                history[0]
+                for history in self.move_history.values()
+                if len(history) == self.ephemeral_threshold
+            ]
         return []
 
     def __str__(self):
