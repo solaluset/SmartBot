@@ -1,4 +1,5 @@
 from itertools import chain
+from abc import ABC, abstractmethod
 from typing import Iterable
 
 TableT = list[list[str]]
@@ -6,7 +7,7 @@ EphemeralT = list[tuple[int, int]]
 EMPTY = "_"
 
 
-class MaxScoreBase:
+class MaxScoreBase(ABC):
     def __init__(
         self, table: TableT, to_win: int, x: int, y: int, ephemeral: EphemeralT
     ):
@@ -19,6 +20,7 @@ class MaxScoreBase:
         self.ephemeral = ephemeral
         self.has_space_before, self.has_space_after = False, False
 
+    @abstractmethod
     def next(self, x: int, y: int) -> tuple[int, int]:
         raise NotImplementedError
 
