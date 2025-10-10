@@ -334,6 +334,7 @@ tictac:
   already_playing: "Гра вже запущена в цьому каналі!"
   missing_opponent: "Ви повинні згадати опонента."
   negative_specs: "Розмір поля і виграшного ряду повинні бути додатніми числами."
+  message-too-big: "Поле завелике."
   field_too_big: "Максимальний розмір поля - %{limit} на %{limit}."
   line_too_big: "Довжина виграшного ряду не може бути більша розміру поля."
   too_many_gamers: "Ви вказали забагато гравців."
@@ -345,6 +346,8 @@ tictac:
   current_player: "Зараз ходить: %{player}%{additional_info}"
   winner: "Переможець: %{winner}"
   draw: "Нічия."
+  main-board: "Основне поле:"
+  full-board: "Повне поле:"
   selected_subboard: " (обраний сегмент: %{subboard})"
   subboard_not_selected: " (оберіть сегмент)"
   stats:

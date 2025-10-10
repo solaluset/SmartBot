@@ -68,7 +68,7 @@ class TicTac(commands.Cog):
             return
 
         curr_sess = (UltimateTicTacToe if mode == "ULTIMATE" else TicTacToe)(
-            await ctx.send(t("tictac.game_started", ctx.language)),
+            None,
             size,
             combo,
             *gamers,
@@ -76,6 +76,9 @@ class TicTac(commands.Cog):
             language=ctx.language,
             ephemeral_threshold=max(0, ephemeral_threshold),
         )
+        if len(str(curr_sess)) > 2000:
+            return await ctx.send(t("tictac.message-too-big", ctx.language))
+        curr_sess.message = await ctx.send(t("tictac.game_started", ctx.language))
 
         self.tictac_sessions[ctx.channel.id] = curr_sess
         await asyncio.sleep(1)
