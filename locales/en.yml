@@ -343,9 +343,11 @@ tictac:
     help: "Stops the game"
     cant_stop: "You cannot stop a game you don't participate in."
     stopped: "The game was stopped."
-  current_player: "Current move: %{player}"
+  current_player: "Current move: %{player}%{additional_info}"
   winner: "Winner: %{winner}"
   draw: "Draw."
+  selected_subboard: " (current subboard: %{subboard})"
+  subboard_not_selected: " (choose subboard)"
   stats:
     help: |
       Player winning statistics
