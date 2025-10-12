@@ -208,6 +208,12 @@ class TTTView(View):
         super().__init__(timeout=300)
         self.ttt = ttt
 
+    async def interaction_check(self, inter) -> bool:
+        return inter.user.mention == self.ttt.gamers[self.ttt.turn_of]
+
+    async def on_check_failure(self, inter):
+        await inter.response.send_message("Not your move.", ephemeral=True)
+
     async def on_timeout(self):
         await self.ttt.edit_message()
 
@@ -218,8 +224,6 @@ class MoveButton(Button):
         self.ttt = ttt
 
     async def callback(self, inter: Interaction):
-        if inter.user.mention != self.ttt.gamers[self.ttt.turn_of]:
-            await inter.response.send_message("Not your move.")
         await inter.response.defer()
         self.ttt.update(self.label)
         await self.ttt.edit_message()
