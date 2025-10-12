@@ -238,10 +238,12 @@ class UltimateTicTacToe(TicTacToe):
         x, y = coords
         if not subboard._update(x, y):
             return subboard_changed
-        if subboard.winner is not None:
-            self._update(self.selected_subboard_x, self.selected_subboard_y)
-        else:
+        if not subboard.winner:
             self.turn_of = subboard.turn_of
+            if subboard.winner is False:
+                self.table[self.selected_subboard_x][self.selected_subboard_y] = " "
+        else:
+            self._update(self.selected_subboard_x, self.selected_subboard_y)
         self.select_subboard(x, y)
         if self.get_selected_subboard().winner is not None:
             self.select_subboard(None, None)
