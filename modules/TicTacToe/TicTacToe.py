@@ -55,6 +55,8 @@ class TicTacToe:
         await self.message.edit(content=self, view=self.get_view())
 
     def get_view(self) -> "TTTView":
+        if self.winner is not None or self.stopped:
+            return None
         view = TTTView(self)
         if len(self.table) <= 5:
             for i, row in enumerate(self.table):
