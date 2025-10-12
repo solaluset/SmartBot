@@ -154,12 +154,13 @@ class TicTacToe:
         return f"```\n\u200b{string}```"
 
     def table_str(self) -> str:
-        max_len = len(str(len(self.table))) + 1
-        text = " " * max_len + " ".join(ascii_uppercase[: len(self.table)]) + "\n"
+        max_len = len(str(len(self.table)))
+        text = " " * (max_len + 1) + " ".join(ascii_uppercase[: len(self.table)]) + "\n"
         ephemeral = self.get_ephemeral()
         for i, row in enumerate(self.table):
             text += (
-                str(i + 1).ljust(max_len)
+                str(i + 1).rjust(max_len)
+                + " "
                 + " ".join(
                     x + EPHEMERENESS_SYMBOL if (i, j) in ephemeral else x
                     for j, x in enumerate(row)
@@ -259,6 +260,7 @@ class UltimateTicTacToe(TicTacToe):
     def table_str(self) -> str:
         ephemeral = self.get_ephemeral()
         rows = []
+        max_number_length = len(str(len(self.subboards)))
         for i, subrow in enumerate(self.subboards):
             row_lines = []
             original_lines = [
@@ -267,7 +269,10 @@ class UltimateTicTacToe(TicTacToe):
                 ).splitlines()
                 for j, board in enumerate(subrow)
             ]
-            original_lines.insert(0, f"{i + 1 :^{len(original_lines[0])}}")
+            lines_length = len(original_lines[0])
+            number = [" " * max_number_length] * lines_length
+            number[(lines_length - 1) // 2] = str(i + 1).rjust(max_number_length)
+            original_lines.insert(0, number)
             for lines in zip(*original_lines):
                 row_lines.append(" | ".join(lines))
             rows.append("\n".join(row_lines))
