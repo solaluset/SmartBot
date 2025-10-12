@@ -209,6 +209,17 @@ class UltimateTicTacToe(TicTacToe):
         return self.subboards[self.selected_subboard_x][self.selected_subboard_y]
 
     def select_subboard(self, x: int | None, y: int | None) -> None:
+        if x is None:
+            empty_count = 0
+            for i, row in enumerate(self.table):
+                for j, cell in enumerate(row):
+                    if cell == EMPTY:
+                        empty_count += 1
+                        empty_x = i
+                        empty_y = j
+            if empty_count == 1:
+                x = empty_x
+                y = empty_y
         self.selected_subboard_x = x
         self.selected_subboard_y = y
 
@@ -242,6 +253,9 @@ class UltimateTicTacToe(TicTacToe):
             self.turn_of = subboard.turn_of
             if subboard.winner is False:
                 self.table[self.selected_subboard_x][self.selected_subboard_y] = " "
+                if self.check_draw():
+                    self.winner = False
+                    return True
         else:
             self._update(self.selected_subboard_x, self.selected_subboard_y)
         self.select_subboard(x, y)
