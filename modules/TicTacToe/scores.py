@@ -72,7 +72,7 @@ class MaxScoreBase(ABC):
                 if (i, j) in self.ephemeral:
                     continue
                 cell = self.table[i][j]
-                if cell != EMPTY:
+                if cell != EMPTY and not cell.isspace():
                     if symbol == EMPTY:
                         symbol = cell
                         score = 1
