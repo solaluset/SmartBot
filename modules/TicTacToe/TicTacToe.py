@@ -1,12 +1,11 @@
 from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
-from typing import TYPE_CHECKING
+
+from discord import Message, Interaction
+from discord.ui import Button, View
 
 from modules.i18n import t
 from .scores import EMPTY, Scores
-
-if TYPE_CHECKING:
-    from discord import Message
 
 
 MAX_FIELD_SIZE = len(ascii_uppercase)
@@ -23,7 +22,7 @@ EPHEMERENESS_SYMBOL = "\u036f"
 class TicTacToe:
     def __init__(
         self,
-        message: "Message",
+        message: Message,
         size: int,
         combo_to_win: int,
         *gamers: str,
@@ -50,7 +49,18 @@ class TicTacToe:
 
     async def resend(self):
         await self.message.delete()
-        self.message = await self.message.channel.send(self)
+        self.message = await self.message.channel.send(self, view=self.get_view())
+
+    async def edit_message(self):
+        await self.message.edit(content=self, view=self.get_view())
+
+    def get_view(self) -> "TTTView":
+        view = TTTView(self)
+        if len(self.table) <= 5:
+            for i, row in enumerate(self.table):
+                for c, cell in zip(ascii_uppercase, row):
+                    view.add_item(MoveButton(self, f"{c}{i + 1}", i, cell == EMPTY))
+        return view
 
     def _parse_cell(self, user_input: str) -> tuple[int, int] | None:
         if not user_input:
@@ -189,6 +199,28 @@ class TicTacToe:
 
     def additional_str(self) -> str:
         return ""
+
+
+class TTTView(View):
+    def __init__(self, ttt: TicTacToe):
+        super().__init__(timeout=300)
+        self.ttt = ttt
+
+    async def on_timeout(self):
+        await self.ttt.edit_message()
+
+
+class MoveButton(Button):
+    def __init__(self, ttt: TicTacToe, label: str, row: int, enabled: bool):
+        super().__init__(label=label, row=row, disabled=not enabled)
+        self.ttt = ttt
+
+    async def callback(self, inter: Interaction):
+        if inter.user.mention != self.ttt.gamers[self.ttt.turn_of]:
+            await inter.response.send_message("Not your move.")
+        await inter.response.defer()
+        self.ttt.update(self.label)
+        await self.ttt.edit_message()
 
 
 class UltimateTicTacToe(TicTacToe):
