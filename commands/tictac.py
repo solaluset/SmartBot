@@ -82,7 +82,10 @@ class TicTac(commands.Cog):
         )
 
     async def _update(self, channel_id: int, resend: bool = False):
-        message, session = self.tictac_sessions[channel_id]
+        data = self.tictac_sessions.get(channel_id)
+        if not data:
+            return
+        message, session = data
         if resend:
             await message.delete()
             message = await message.channel.send(
