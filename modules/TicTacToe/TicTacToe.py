@@ -1,11 +1,8 @@
 from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
 
-from discord import Message, Interaction
-from discord.ui import Button, View
-
 from modules.i18n import t
-from .scores import EMPTY, Scores
+from .scores import EMPTY, Scores, MaxScoreBase
 
 
 MAX_FIELD_SIZE = len(ascii_uppercase)
@@ -15,54 +12,43 @@ for redef_sign in reversed(("x", "o")):
     SIGNS.insert(0, redef_sign)
 del redef_sign
 SIGNS = tuple(SIGNS)
-MAX_GAMERS = len(SIGNS)
+MAX_PLAYERS = len(SIGNS)
 EPHEMERENESS_SYMBOL = "\u036f"
 
 
 class TicTacToe:
     def __init__(
         self,
-        message: Message,
         size: int,
-        combo_to_win: int,
-        *gamers: str,
-        use_ai=False,
+        win_size: int,
+        players: list[str],
         language="en",
+        *,
+        ai_players: list[str] = [],
         ephemeral_threshold=0,
     ):
-        self.message = message
-        self.gamers = gamers
-        self.use_ai = use_ai
+        self.players = players
+        self.ai_players = ai_players
         self.language = language
-        self.signs = SIGNS[: len(gamers)]
-        if len(self.signs) != len(self.gamers):
-            raise ValueError("Too many gamers.")
-        self.turn_of = 0
+        self.signs = SIGNS[: len(players)]
+        if len(self.signs) != len(self.players):
+            raise ValueError("Too many players.")
+        self.current_player_index = 0
         self.winner = None
-        self.table = [[EMPTY] * size]
+        self.draw = False
+        self.board = [[EMPTY] * size]
         for _ in range(1, size):
-            self.table.append(self.table[0].copy())
-        self.to_win = combo_to_win
+            self.board.append(self.board[0].copy())
+        self.win_size = win_size
         self.move_history = defaultdict(list)
         self.ephemeral_threshold = ephemeral_threshold
         self.stopped = False
 
-    async def resend(self):
-        await self.message.delete()
-        self.message = await self.message.channel.send(self, view=self.get_view())
+    def get_current_player(self) -> str:
+        return self.players[self.current_player_index]
 
-    async def edit_message(self):
-        await self.message.edit(content=self, view=self.get_view())
-
-    def get_view(self) -> "TTTView":
-        if self.winner is not None or self.stopped:
-            return None
-        view = TTTView(self)
-        if len(self.table) <= 5:
-            for i, row in enumerate(self.table):
-                for c, cell in zip(ascii_uppercase, row):
-                    view.add_item(MoveButton(self, f"{c}{i + 1}", i, cell == EMPTY))
-        return view
+    def get_active_board(self) -> list[list[str]]:
+        return self.board
 
     def _parse_cell(self, user_input: str) -> tuple[int, int] | None:
         if not user_input:
@@ -81,7 +67,7 @@ class TicTacToe:
         except ValueError:
             return None
         letter = ord(letter) - ord("A")
-        if letter >= len(self.table) or number not in range(len(self.table)):
+        if letter >= len(self.board) or number not in range(len(self.board)):
             return None
         return number, letter
 
@@ -92,55 +78,62 @@ class TicTacToe:
         return self._update(coords[0], coords[1])
 
     def _update(self, x: int, y: int) -> bool:
-        if self.table[x][y] != EMPTY:
+        if self.board[x][y] != EMPTY:
             return False
-        sign = self.signs[self.turn_of]
+        sign = self.signs[self.current_player_index]
         if (
             self.ephemeral_threshold
             and len(self.move_history[sign]) == self.ephemeral_threshold
         ):
             ephemeral = self.move_history[sign].pop(0)
             self._handle_ephemereness(ephemeral[0], ephemeral[1])
-        self.table[x][y] = sign
+        self.board[x][y] = sign
         self.move_history[sign].append((x, y))
-        if self.check_win():
-            self.winner = self.gamers[self.turn_of]
+
+        self.current_player_index += 1
+        if self.current_player_index == len(self.players):
+            self.current_player_index = 0
+
+        winning_score = self.get_winning_score()
+        if winning_score:
+            for i, j in winning_score.iter_cells():
+                self.board[i][j] = self.board[i][j].upper()
+            self.winner = next(
+                player
+                for player, sign in zip(self.players, self.signs)
+                if sign == winning_score.symbol
+            )
             return True
         if self.check_draw():
-            self.winner = False
+            self.draw = True
             return True
-        self.turn_of += 1
-        if self.turn_of == len(self.gamers):
-            self.turn_of = 0
-        if self.use_ai and self.message.author.mention == self.gamers[self.turn_of]:
+
+        if self.players[self.current_player_index] in self.ai_players:
             return self._update(
-                *Scores(self.table, self.to_win, self.get_ephemeral()).get_move(
-                    self.signs[self.turn_of]
+                *Scores(self.board, self.win_size, self.get_ephemeral()).get_move(
+                    self.signs[self.current_player_index]
                 )
             )
         return True
 
     def _handle_ephemereness(self, x: int, y: int) -> None:
-        self.table[x][y] = EMPTY
+        self.board[x][y] = EMPTY
 
     def check_draw(self) -> bool:
-        for i in self.table:
+        for i in self.board:
             for j in i:
                 if j == EMPTY:
                     return False
         return True
 
-    def check_win(self) -> bool:
-        score = max(Scores(self.table, self.to_win), key=lambda x: x.score)
-        if score.score >= self.to_win:
-            for i, j in score.iter_cells():
-                self.table[i][j] = self.table[i][j].upper()
-            return True
-        return False
+    def get_winning_score(self) -> MaxScoreBase | None:
+        score = max(Scores(self.board, self.win_size), key=lambda x: x.score)
+        if score.score >= self.win_size:
+            return score
+        return None
 
     def stop(self):
-        if self.winner is None:
-            self.stopped = True
+        self.stopped = True
 
     def get_ephemeral(self) -> list[tuple[int, int]]:
         if self.ephemeral_threshold:
@@ -153,10 +146,10 @@ class TicTacToe:
 
     def __str__(self):
         return (
-            " vs ".join(self.gamers)
+            " vs ".join(self.players)
             + "\n"
             + self.prefix_str()
-            + self._codeblock(self.table_str())
+            + self._codeblock(self.board_str())
             + "\n"
             + self.signature_str()
         )
@@ -165,11 +158,11 @@ class TicTacToe:
     def _codeblock(string: str) -> str:
         return f"```\n\u200b{string}```"
 
-    def table_str(self) -> str:
-        max_len = len(str(len(self.table)))
-        text = " " * (max_len + 1) + " ".join(ascii_uppercase[: len(self.table)]) + "\n"
+    def board_str(self) -> str:
+        max_len = len(str(len(self.board)))
+        text = " " * (max_len + 1) + " ".join(ascii_uppercase[: len(self.board)]) + "\n"
         ephemeral = self.get_ephemeral()
-        for i, row in enumerate(self.table):
+        for i, row in enumerate(self.board):
             text += (
                 str(i + 1).rjust(max_len)
                 + " "
@@ -182,61 +175,35 @@ class TicTacToe:
         return text
 
     def signature_str(self) -> str:
-        if self.stopped:
-            return t("tictac.stop.stopped", self.language)
+        if self.draw:
+            return t("tictac.draw", self.language)
         elif self.winner is None:
+            if self.stopped:
+                return t("tictac.stop.stopped", self.language)
             return t(
                 "tictac.current_player",
                 self.language,
-                player=self.gamers[self.turn_of],
-                additional_info=self.additional_str(),
+                player=self.players[self.current_player_index],
+                additional_info=self.suffix_str(),
             )
-        elif self.winner:
-            return t("tictac.winner", self.language, winner=self.winner)
         else:
-            return t("tictac.draw", self.language)
+            return t("tictac.winner", self.language, winner=self.winner)
 
     def prefix_str(self) -> str:
         return ""
 
-    def additional_str(self) -> str:
+    def suffix_str(self) -> str:
         return ""
-
-
-class TTTView(View):
-    def __init__(self, ttt: TicTacToe):
-        super().__init__(timeout=300)
-        self.ttt = ttt
-
-    async def interaction_check(self, inter) -> bool:
-        return inter.user.mention == self.ttt.gamers[self.ttt.turn_of]
-
-    async def on_check_failure(self, inter):
-        await inter.response.send_message("Not your move.", ephemeral=True)
-
-    async def on_timeout(self):
-        await self.ttt.edit_message()
-
-
-class MoveButton(Button):
-    def __init__(self, ttt: TicTacToe, label: str, row: int, enabled: bool):
-        super().__init__(label=label, row=row, disabled=not enabled)
-        self.ttt = ttt
-
-    async def callback(self, inter: Interaction):
-        await inter.response.defer()
-        self.ttt.update(self.label)
-        await self.ttt.edit_message()
 
 
 class UltimateTicTacToe(TicTacToe):
     def __init__(self, *args, **kwargs):
-        kwargs["use_ai"] = False
+        kwargs["ai_players"] = []
         super().__init__(*args, **kwargs)
         self._ttt_factory = lambda: TicTacToe(*args, **kwargs)
         self.subboards = [
-            [self._ttt_factory() for _ in range(len(self.table))]
-            for _ in range(len(self.table))
+            [self._ttt_factory() for _ in range(len(self.board))]
+            for _ in range(len(self.board))
         ]
         self.selected_subboard_x = None
         self.selected_subboard_y = None
@@ -249,7 +216,7 @@ class UltimateTicTacToe(TicTacToe):
     def select_subboard(self, x: int | None, y: int | None) -> None:
         if x is None:
             empty_count = 0
-            for i, row in enumerate(self.table):
+            for i, row in enumerate(self.board):
                 for j, cell in enumerate(row):
                     if cell == EMPTY:
                         empty_count += 1
@@ -260,6 +227,12 @@ class UltimateTicTacToe(TicTacToe):
                 y = empty_y
         self.selected_subboard_x = x
         self.selected_subboard_y = y
+
+    def get_active_board(self) -> list[list[str]]:
+        subboard = self.get_selected_subboard()
+        if not subboard:
+            return super().get_active_board()
+        return subboard.get_active_board()
 
     def update(self, user_input: str) -> bool:
         subboard = self.get_selected_subboard()
@@ -273,7 +246,7 @@ class UltimateTicTacToe(TicTacToe):
                 self.select_subboard(coords[0], coords[1])
                 subboard = self.get_selected_subboard()
                 subboard_changed = True
-                if subboard.winner is not None:
+                if subboard.winner is not None or subboard.draw:
                     self.select_subboard(None, None)
                     return False
                 if not parts:
@@ -283,21 +256,24 @@ class UltimateTicTacToe(TicTacToe):
         coords = self._parse_cell(user_input)
         if coords is None:
             return subboard_changed
-        subboard.turn_of = self.turn_of
+        subboard.current_player_index = self.current_player_index
         x, y = coords
         if not subboard._update(x, y):
             return subboard_changed
-        if not subboard.winner:
-            self.turn_of = subboard.turn_of
-            if subboard.winner is False:
-                self.table[self.selected_subboard_x][self.selected_subboard_y] = " "
-                if self.check_draw():
-                    self.winner = False
-                    return True
+
+        if subboard.draw:
+            self.current_player_index = subboard.current_player_index
+            self.board[self.selected_subboard_x][self.selected_subboard_y] = " "
+            if self.check_draw():
+                self.draw = True
+                return True
+        elif subboard.winner is None:
+            self.current_player_index = subboard.current_player_index
         else:
             self._update(self.selected_subboard_x, self.selected_subboard_y)
         self.select_subboard(x, y)
-        if self.get_selected_subboard().winner is not None:
+        subboard = self.get_selected_subboard()
+        if subboard.winner is not None or subboard.draw:
             self.select_subboard(None, None)
         return True
 
@@ -311,7 +287,7 @@ class UltimateTicTacToe(TicTacToe):
             return text
         return "".join(c if c.isspace() else c + EPHEMERENESS_SYMBOL for c in text)
 
-    def table_str(self) -> str:
+    def board_str(self) -> str:
         ephemeral = self.get_ephemeral()
         rows = []
         max_number_length = len(str(len(self.subboards)))
@@ -319,7 +295,7 @@ class UltimateTicTacToe(TicTacToe):
             row_lines = []
             original_lines = [
                 self._maybe_ephemeral(
-                    board.table_str(), (i, j) in ephemeral
+                    board.board_str(), (i, j) in ephemeral
                 ).splitlines()
                 for j, board in enumerate(subrow)
             ]
@@ -346,13 +322,13 @@ class UltimateTicTacToe(TicTacToe):
         return (
             t("tictac.main-board", self.language)
             + "\n"
-            + self._codeblock(super().table_str())
+            + self._codeblock(super().board_str())
             + "\n"
             + t("tictac.full-board", self.language)
             + "\n"
         )
 
-    def additional_str(self) -> str:
+    def suffix_str(self) -> str:
         return (
             t(
                 "tictac.selected_subboard",

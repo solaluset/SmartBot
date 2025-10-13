@@ -1,5 +1,3 @@
-import asyncio
-
 from discord import Message, User
 from discord.ext import commands
 from discord.utils import escape_markdown
@@ -9,7 +7,8 @@ from sqlalchemy.dialects.postgresql import insert
 from modules.i18n import t
 from modules.regexps import ID
 from modules.db import WrappedTable
-from modules.TicTacToe import MAX_FIELD_SIZE, MAX_GAMERS, TicTacToe, UltimateTicTacToe
+from modules.TicTacToe import MAX_FIELD_SIZE, MAX_PLAYERS, TicTacToe, UltimateTicTacToe
+from modules.TicTacToe.discord import build_view
 from modules.converters import SmartUserConverter
 
 
@@ -53,7 +52,6 @@ class TicTac(commands.Cog):
             await ctx.send(t("tictac.missing_opponent", ctx.language))
             return
         gamers = [user.mention for user in [ctx.author] + gamers]
-        use_ai = ctx.me.mention in gamers
         if size < 1 or combo < 1:
             await ctx.send(t("tictac.negative_specs", ctx.language))
             return
@@ -63,31 +61,56 @@ class TicTac(commands.Cog):
         if combo > size:
             await ctx.send(t("tictac.line_too_big", ctx.language))
             return
-        if len(gamers) > MAX_GAMERS:
+        if len(gamers) > MAX_PLAYERS:
             await ctx.send(t("tictac.too_many_gamers", ctx.language))
             return
 
         curr_sess = (UltimateTicTacToe if mode == "ULTIMATE" else TicTacToe)(
-            None,
             size,
             combo,
-            *gamers,
-            use_ai=use_ai,
-            language=ctx.language,
+            gamers,
+            ctx.language,
+            ai_players=[ctx.me.mention],
             ephemeral_threshold=max(0, ephemeral_threshold),
         )
         if len(str(curr_sess)) > 2000:
             return await ctx.send(t("tictac.message-too-big", ctx.language))
-        curr_sess.message = await ctx.send(t("tictac.game_started", ctx.language))
 
-        self.tictac_sessions[ctx.channel.id] = curr_sess
-        await asyncio.sleep(1)
-        await curr_sess.resend()
+        self.tictac_sessions[ctx.channel.id] = (
+            await ctx.send(**self._build_message(ctx.channel.id, curr_sess)),
+            curr_sess,
+        )
 
-    async def _stop(self, id: int):
-        curr_sess = self.tictac_sessions.pop(id)
-        curr_sess.stop()
-        await curr_sess.resend()
+    async def _update(self, channel_id: int, resend: bool = False):
+        message, session = self.tictac_sessions[channel_id]
+        if resend:
+            await message.delete()
+            message = await message.channel.send(
+                **self._build_message(channel_id, session)
+            )
+        else:
+            await message.edit(**self._build_message(channel_id, session))
+        if session.winner or session.draw or session.stopped:
+            del self.tictac_sessions[channel_id]
+            if session.stopped:
+                return
+            # update stats only if game was "fair"
+            if (
+                session.win_size >= 4
+                or session.win_size == 3
+                and len(session.board) == 3
+            ):
+                players = [ID.search(p).group() for p in session.players]
+                winner = ID.search(session.winner).group() if session.winner else None
+                await self.update_stats(players, winner)
+        else:
+            self.tictac_sessions[channel_id] = (message, session)
+
+    def _build_message(self, channel_id: int, session: TicTacToe) -> dict:
+        return {
+            "content": session,
+            "view": build_view(session, lambda: self._update(channel_id)),
+        }
 
     @tictac.command()
     async def stop(self, ctx):
@@ -95,13 +118,15 @@ class TicTac(commands.Cog):
         curr_sess = self.tictac_sessions.get(ctx.channel.id, None)
         if curr_sess is None:
             return
+        curr_sess = curr_sess[1]
         if (
-            ctx.author.mention not in curr_sess.gamers
+            ctx.author.mention not in curr_sess.players
             and not ctx.channel.permissions_for(ctx.author).manage_server
         ):
             await ctx.send(t("tictac.stop.cant_stop", ctx.language), delete_after=5.0)
         else:
-            await self._stop(ctx.channel.id)
+            curr_sess.stop()
+            await self._update(ctx.channel.id, True)
 
     @tictac.command(usage="tictac.stats.usage")
     async def stats(self, ctx, user: SmartUserConverter = None):
@@ -145,28 +170,14 @@ class TicTac(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: Message):
         curr_sess = self.tictac_sessions.get(message.channel.id, None)
-        if (
-            not curr_sess
-            or message.author.mention != curr_sess.gamers[curr_sess.turn_of]
-        ):
+        if curr_sess is None:
             return
-        if not curr_sess.update(message.content):
+        game_message, session = curr_sess
+        if message.author.mention != session.get_current_player():
             return
-        if curr_sess.winner is None:
-            await curr_sess.resend()
-        else:
-            # update stats only if game was "fair"
-            if (
-                curr_sess.to_win >= 4
-                or curr_sess.to_win == 3
-                and len(curr_sess.table) == 3
-            ):
-                gamers = [ID.search(g).group() for g in curr_sess.gamers]
-                winner = (
-                    ID.search(curr_sess.winner).group() if curr_sess.winner else None
-                )
-                await self.update_stats(gamers, winner)
-            await self._stop(message.channel.id)
+        if not session.update(message.content):
+            return
+        await self._update(message.channel.id, True)
 
 
 def setup(bot):
