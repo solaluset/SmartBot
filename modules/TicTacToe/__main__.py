@@ -7,9 +7,9 @@ i18n.init()
 TicTacToe
 UltimateTicTacToe
 
-t = UltimateTicTacToe(None, 3, 3, "me", "you", ephemeral_threshold=3)
+t = TicTacToe(3, 3, ["me", "you"], ephemeral_threshold=0)
 
-while t.winner is None:
+while t.winner is None and not t.draw:
     print(t)
     t.update(input("Move: "))
 print(t)
