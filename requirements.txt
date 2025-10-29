@@ -1,6 +1,6 @@
 # bot
 py-cord==2.7.0rc1
-aiohttp==3.12.15
+aiohttp==3.13.2
 # database
 SQLAlchemy[asyncio]==2.0.44
 asyncpg==0.30.0
