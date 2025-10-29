@@ -23,4 +23,4 @@ repos:
         -   "--exclude"
         -   "modules/timeparse.py"
         -   "--ignore"
-        -   "E203,W503"
+        -   "E201,E202,E203,W503"
