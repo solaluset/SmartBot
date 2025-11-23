@@ -39,6 +39,10 @@ async def user(ctx, *, user: SmartUserConverter = None):
             ),
             inline=False,
         )
+    if user.primary_guild is not None:
+        res.add_field(
+            name=t("user.guild_tag", ctx.language), value=user.primary_guild.tag
+        )
     await res.send()
 
 

@@ -371,6 +371,7 @@ user:
   created_ago: *created_ago
   joined: "member joined"
   joined_ago: *created_ago
+  guild_tag: "Server tag"
 
 avatar:
   help: "User avatar"

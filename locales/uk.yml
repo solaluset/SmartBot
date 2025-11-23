@@ -370,6 +370,7 @@ user:
   created_ago: *created_ago
   joined: "учасник приєднався"
   joined_ago: *created_ago
+  guild_tag: "Теґ сервера"
 
 avatar:
   help: "Аватар користувача"
