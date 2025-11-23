@@ -321,11 +321,11 @@ say:
 server:
   help: "Displays server information"
   description: "Server information"
-  id: &id "id"
-  created: "server created"
+  id: &id "ID"
+  created: "Server created"
   created_ago: &created_ago "%{time} (%{count} %{p(day|days)} ago)"
-  owner: "owner"
-  member_count: "member count"
+  owner: "Owner"
+  member_count: "Member count"
 
 tictac:
   help: |
@@ -367,9 +367,9 @@ user:
   user: *user_info
   bot: "Bot information"
   id: *id
-  created: "account created"
+  created: "Account created"
   created_ago: *created_ago
-  joined: "member joined"
+  joined: "Member joined"
   joined_ago: *created_ago
   guild_tag: "Server tag"
 

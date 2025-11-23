@@ -320,11 +320,11 @@ say:
 server:
   help: "Показує інформацію про сервер"
   description: "Інформація про сервер"
-  id: &id "айді"
-  created: "сервер створено"
+  id: &id "Айді"
+  created: "Сервер створено"
   created_ago: &created_ago "%{time} (%{count} %{p(день|дні|днів)} тому)"
-  owner: "власник"
-  member_count: "кількість учасників"
+  owner: "Власник"
+  member_count: "Кількість учасників"
 
 tictac:
   help: |
@@ -366,9 +366,9 @@ user:
   user: *user_info
   bot: "Інформація про бота"
   id: *id
-  created: "акаунт створено"
+  created: "Акаунт створено"
   created_ago: *created_ago
-  joined: "учасник приєднався"
+  joined: "Учасник приєднався"
   joined_ago: *created_ago
   guild_tag: "Теґ сервера"
 
