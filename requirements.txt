@@ -3,7 +3,7 @@ py-cord==2.7.0rc1
 aiohttp==3.13.2
 # database
 SQLAlchemy[asyncio]==2.0.44
-asyncpg==0.30.0
+asyncpg==0.31.0
 ring==0.10.1
 # aliases
 regex==2025.11.3
