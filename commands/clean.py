@@ -5,7 +5,6 @@ from discord.ext import commands
 
 from modules.i18n import t
 
-
 S_ARG = compile(r"(?<!\S)-s$")
 
 

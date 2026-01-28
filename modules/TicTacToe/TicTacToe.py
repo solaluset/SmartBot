@@ -4,7 +4,6 @@ from string import ascii_lowercase, ascii_uppercase
 from modules.i18n import t
 from .scores import EMPTY, Scores, MaxScoreBase
 
-
 MAX_FIELD_SIZE = len(ascii_uppercase)
 SIGNS = list(ascii_lowercase)
 for redef_sign in reversed(("x", "o")):

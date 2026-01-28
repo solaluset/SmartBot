@@ -11,7 +11,6 @@ from modules.TicTacToe import MAX_FIELD_SIZE, MAX_PLAYERS, TicTacToe, UltimateTi
 from modules.TicTacToe.discord import build_view
 from modules.converters import SmartUserConverter
 
-
 ttt_table = WrappedTable(
     "ttt_stats",
     None,

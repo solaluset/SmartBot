@@ -6,7 +6,6 @@ import discord
 from modules.SmartBot import SmartBot
 from modules.i18n import init as init_i18n
 
-
 log.basicConfig(
     level=log.WARNING,
     format="[%(asctime)s] [%(levelname)s] %(message)s",

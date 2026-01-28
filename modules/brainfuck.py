@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 OP_INC = 0
 OP_DEC = 1
 OP_INC_PTR = 2

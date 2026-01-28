@@ -3,7 +3,6 @@ from discord.ext import commands
 from modules import embed
 from modules.i18n import t
 
-
 ENDPOINT = "http://api.mathjs.org/v4/?expr="
 
 
