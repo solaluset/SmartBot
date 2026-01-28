@@ -3,7 +3,6 @@ from discord.ext import commands
 from modules import embed
 from modules.i18n import t, generate_name_localizations
 
-
 ENG = "`qwertyuiop[]\\asdfghjkl;'zxcvbnm,./@#$^&QWERTYUIOP{}|ASDFGHJKL:\"ZXCVBNM<>?"
 UKR = "'йцукенгшщзхїґфівапролджєячсмитьбю.\"№;:?ЙЦУКЕНГШЩЗХЇҐФІВАПРОЛДЖЄЯЧСМИТЬБЮ,"
 TR = str.maketrans(UKR + ENG, ENG + UKR)

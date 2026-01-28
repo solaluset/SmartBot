@@ -1,7 +1,6 @@
 from sqlalchemy import MetaData, Table
 from sqlalchemy.dialects.postgresql import insert
 
-
 metadata = MetaData()
 
 

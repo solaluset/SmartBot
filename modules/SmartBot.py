@@ -24,7 +24,6 @@ from .db import WrappedTable, metadata
 from .i18n import t
 from .converters import RoleTooHighForUser, RoleTooHighForBot, NotSameGuild
 
-
 CONFIG_FILE = "config.json"
 DEFAULT_CONFIG = {
     "token": "",

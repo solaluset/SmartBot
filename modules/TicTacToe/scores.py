@@ -104,7 +104,7 @@ class MaxScoreBase(ABC):
             self.move_end()
         if max_bounds is not None:
             self.score = max_score
-            ((self.start_x, self.start_y), (self.end_x, self.end_y)) = max_bounds
+            (self.start_x, self.start_y), (self.end_x, self.end_y) = max_bounds
             self.symbol = max_symbol
             self.has_space_before, self.has_space_after = max_spaces
 

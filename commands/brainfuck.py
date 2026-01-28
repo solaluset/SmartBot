@@ -3,7 +3,6 @@ from discord.ext import commands
 
 from modules.brainfuck import BFException, State, parse
 
-
 MAX_OPS = 10_000
 
 

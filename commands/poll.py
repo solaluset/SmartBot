@@ -4,7 +4,6 @@ from discord.ext import commands
 
 from modules import embed
 
-
 MAX_TITLE_SIZE = 256
 wrap = TextWrapper(MAX_TITLE_SIZE).wrap
 

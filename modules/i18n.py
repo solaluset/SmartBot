@@ -6,7 +6,6 @@ import logging as log
 import i18n
 from i18n import t
 
-
 LOCALES_PATH = "./locales"
 AVAILABLE_LANGUAGES = [i.rpartition(".")[0] for i in os.listdir(LOCALES_PATH)]
 

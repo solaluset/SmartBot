@@ -6,7 +6,6 @@ from traceback import print_exc
 from contextlib import redirect_stdout
 from typing import Any, Iterable, Sequence, TypeVar
 
-
 T = TypeVar("T")
 
 

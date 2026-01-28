@@ -11,7 +11,6 @@ from decimal import (
     Decimal,
 )
 
-
 DEFAULT_ALPHABET = digits + ascii_uppercase
 DEFAULT_SIGNS = ("+", "-")
 BUILTIN_FORMATS = {2: "b", 8: "o", 10: "", 16: "X"}

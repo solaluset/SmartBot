@@ -17,7 +17,6 @@ from modules.SmartBot import (
     REMOVE_ALIASES,
 )
 
-
 rr_table = WrappedTable(
     "reaction_roles",
     None,

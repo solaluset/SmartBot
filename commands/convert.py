@@ -2,7 +2,6 @@ from discord.ext import commands
 from modules import embed, num_converter
 from modules.i18n import t
 
-
 MIN_NUM_SYS = 2
 MAX_NUM_SYS = 36
 

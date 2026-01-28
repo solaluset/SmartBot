@@ -1,7 +1,6 @@
 from modules import i18n
 from . import TicTacToe, UltimateTicTacToe
 
-
 i18n.init()
 
 TicTacToe

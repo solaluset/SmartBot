@@ -7,7 +7,6 @@ from discord.utils import escape_markdown
 from modules import permissions, timeparse
 from modules.i18n import t
 
-
 D_ARG = compile(r"(?<!\S)-d\s*(?P<num>.*)$")
 
 

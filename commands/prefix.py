@@ -2,7 +2,6 @@ from discord.ext import commands
 from modules.SmartBot import MAX_PREFIX_LEN, ADD_ALIASES, REMOVE_ALIASES
 from modules.i18n import t
 
-
 MAX_PREFIXES_PER_GUILD = 5
 
 

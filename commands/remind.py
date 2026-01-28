@@ -14,7 +14,6 @@ from modules.regexps import QUOTED_PATTERN
 from modules.SmartBot import REMOVE_ALIASES
 from modules.timeparse import TIMEFORMATS, timeparse
 
-
 MAX_REMINDER_LEN = 1000
 reminders_table = WrappedTable(
     "reminders",
