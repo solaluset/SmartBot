@@ -10,7 +10,7 @@ from modules.i18n import t
 from modules.db import WrappedTable
 from modules.utils import chunks
 from modules.converters import ReactionConverter, ManageableRole, SameGuildMessage
-from modules.SmartBot import (
+from modules.prima import (
     HTTP_INVALID_FORM_BODY,
     HTTP_UNKNOWN_EMOJI,
     ADD_ALIASES,

@@ -28,11 +28,11 @@ CONFIG_FILE = "config.json"
 DEFAULT_CONFIG = {
     "token": "",
     "db_url": "",
-    "activity": {"name": "#StopWar", "type": 0},
+    "activity": {"name": "", "type": 0},
     "status": "online",
     "owner_ids": [],
     "test_channel_id": 0,
-    "prefix": ["s", "S"],
+    "prefix": ["p1", "P1"],
     "default_language": "en",
     "support_invite": "",
 }
@@ -104,7 +104,7 @@ def unknown_error(ctx, error):
     return t("errors.unknown", ctx.language)
 
 
-class SmartBot(commands.Bot):
+class PrimaBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.test_mode = kwargs.pop("test_mode", False)
         if self.test_mode:
@@ -144,7 +144,7 @@ class SmartBot(commands.Bot):
         )
 
     def __ring_key__(self):
-        return f"SmartBot({self.user.id})"
+        return f"PrimaBot({self.user.id})"
 
     async def on_ready(self):
         log.info("The bot is, like, ready")
@@ -175,7 +175,7 @@ class SmartBot(commands.Bot):
         if message.author.bot:
             return
 
-        ctx = await self.get_context(message, cls=SmartContext)
+        ctx = await self.get_context(message, cls=PrimaContext)
         perms = ctx.channel.permissions_for(ctx.me)
         if perms.send_messages:
             add_zipper = False
@@ -240,7 +240,7 @@ class SmartBot(commands.Bot):
 
     async def get_context(self, message: Message, *, cls=None):
         if cls is None:
-            cls = SmartContext
+            cls = PrimaContext
         ctx = await super().get_context(message, cls=cls)
         ctx.language = await self.get_language(message.guild)
         return ctx
@@ -312,7 +312,7 @@ class SmartBot(commands.Bot):
         log.info(f"{count} extensions loaded.")
 
 
-class SmartContext(commands.Context):
+class PrimaContext(commands.Context):
     async def send(self, content=None, **kwargs):
         if not self.channel.permissions_for(self.me).send_messages:
             # an alias can bring us here
@@ -328,7 +328,7 @@ class SmartContext(commands.Context):
         return await super().send(content, allowed_mentions=allowed_mentions, **kwargs)
 
 
-class SmartConsole(InteractiveConsole):
+class PrimaConsole(InteractiveConsole):
     def __init__(
         self,
         bot,
@@ -388,7 +388,7 @@ def start_console(bot):
     except ImportError:
         pass
     Thread(
-        target=SmartConsole(
+        target=PrimaConsole(
             bot, locals={"bot": bot, "commands": commands, "discord": discord}
         ).interact,
         args=("Console activated",),

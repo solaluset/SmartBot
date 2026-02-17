@@ -1,7 +1,7 @@
 from discord.ext import commands
 from modules import embed
 from modules.i18n import t
-from modules.SmartBot import REMOVE_ALIASES
+from modules.prima import REMOVE_ALIASES
 from modules.converters import ManageableRole
 
 

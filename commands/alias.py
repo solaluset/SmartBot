@@ -5,7 +5,7 @@ from discord import Message
 from discord.ext import commands
 
 from modules.i18n import t
-from modules.SmartBot import ADD_ALIASES, REMOVE_ALIASES
+from modules.prima import ADD_ALIASES, REMOVE_ALIASES
 from modules.regexps import (
     ARG,
     VAR_ARG,

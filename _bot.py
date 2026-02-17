@@ -3,7 +3,7 @@ import logging as log
 
 import discord
 
-from modules.SmartBot import SmartBot
+from modules.prima import PrimaBot
 from modules.i18n import init as init_i18n
 
 log.basicConfig(
@@ -17,7 +17,7 @@ log.info("Configuring the bot...")
 
 init_i18n()
 
-bot = SmartBot(
+bot = PrimaBot(
     description="bot_description",
     intents=discord.Intents.all(),
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True),

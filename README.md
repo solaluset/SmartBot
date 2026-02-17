@@ -1,6 +1,6 @@
-# SmartBot
+# Prima
 
-SmartBot is a fun, small multipurpose bot.
+Prima is a fun, small multipurpose bot.
 
 You can find out about most commands using the help command.
 

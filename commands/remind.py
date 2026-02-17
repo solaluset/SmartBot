@@ -11,7 +11,7 @@ from modules.db import WrappedTable
 from modules.i18n import t
 from modules.embed import Embed
 from modules.regexps import QUOTED_PATTERN
-from modules.SmartBot import REMOVE_ALIASES
+from modules.prima import REMOVE_ALIASES
 from modules.timeparse import TIMEFORMATS, timeparse
 
 MAX_REMINDER_LEN = 1000
