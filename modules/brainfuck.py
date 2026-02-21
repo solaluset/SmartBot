@@ -69,8 +69,8 @@ class State:
     def __init__(self, input: bytes, ops_limit: int, mem_size: int = 30_000):
         self.memory = bytearray(mem_size)
         self.current_cell = 0
-        self.input = input
-        self.output = b""
+        self.input = bytearray(input)
+        self.output = bytearray()
         self.ops_left = ops_limit
 
     def decrement_ops(self):
@@ -102,9 +102,10 @@ class State:
                 self.current_cell -= 1
                 self.current_cell %= len(self.memory)
             elif op == OP_WRITE:
-                self.output += self.memory[self.current_cell : self.current_cell + 1]
+                self.output.append(self.memory[self.current_cell])
             elif op == OP_READ:
                 if self.input:
-                    self.memory[self.current_cell] = self.input[0]
-                    self.input = self.input[1:]
+                    self.memory[self.current_cell] = self.input.pop(0)
+                else:
+                    self.memory[self.current_cell] = 0
             self.decrement_ops()
