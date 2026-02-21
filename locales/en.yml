@@ -227,14 +227,6 @@ layout:
   missing_text: "Cannot find the text."
   title: "Layout change"
 
-poll:
-  help: |
-    Voting
-    The first line of the message is the subject of the voting
-    If additional lines are specified, the bot will try to add the reactions they start with
-    If the text is one line, the bot will add thumbs up and down
-  usage: &text_arg "<text>"
-
 prefix:
   help: |
     Prefix management
@@ -316,7 +308,7 @@ remind:
 
 say:
   help: "Says text"
-  usage: *text_arg
+  usage: "<text>"
 
 server:
   help: "Displays server information"

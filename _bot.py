@@ -40,7 +40,6 @@ bot.load_extensions(
     "invite",
     "language",
     "layout",
-    "poll",
     "prefix",
     "react",
     "reactionrole",
