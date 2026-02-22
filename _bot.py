@@ -21,6 +21,7 @@ bot = PrimaBot(
     description="bot_description",
     intents=discord.Intents.all(),
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True),
+    case_insensitive=True,
     test_mode="--test" in sys.argv,
 )
 
