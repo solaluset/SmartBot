@@ -26,18 +26,23 @@ def handle_missing_translation(key, locale, **_):
     return key
 
 
-def plural_uk(*args: str, count: int, **kwargs) -> str:
+def plural_uk(
+    singular: str, plural1: str, plural2: str, /, *, count: int, **kwargs
+) -> str:
     count = abs(count)
     rem = count % 10
     if rem >= 5 or rem == 0 or 11 <= count % 100 <= 19:
-        return args[2]
+        return plural2
     elif rem == 1:
-        return args[0]
-    return args[1]
+        return singular
+    return plural1
 
 
-def plural_en(*args: str, count: int, **kwargs) -> str:
-    return args[abs(count) != 1]
+def plural_en(singular: str, plural: str, /, *, count: int, **kwargs) -> str:
+    if abs(count) == 1:
+        return singular
+    else:
+        return plural
 
 
 def generate_name_localizations(key: str) -> dict[str, str]:
