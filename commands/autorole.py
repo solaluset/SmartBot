@@ -21,7 +21,12 @@ class AutoRole(commands.Cog):
             name=t("autorole.current", ctx.language),
             value=role.mention if role else t("autorole.not_set", ctx.language),
         )
-        await em.send()
+        warning = (
+            t("errors.bot_needs_higher_role", ctx.language)
+            if role and role >= ctx.me.top_role
+            else None
+        )
+        await em.send(content=warning)
 
     @autorole.command(usage="autorole.set.usage")
     @commands.has_permissions(manage_guild=True, manage_roles=True)
@@ -36,7 +41,6 @@ class AutoRole(commands.Cog):
 
     @autorole.command(aliases=REMOVE_ALIASES)
     @commands.has_permissions(manage_guild=True, manage_roles=True)
-    @commands.bot_has_permissions(manage_roles=True)
     async def remove(self, ctx):
         "autorole.remove.help"
         await ctx.bot.guilds_data.upsert(

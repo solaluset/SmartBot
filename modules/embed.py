@@ -16,7 +16,9 @@ class Embed(BaseEmbed):
                 ctx.me.color if ctx.me and ctx.me.color.value else Color.dark_theme()
             )
 
-    async def send(self, dest=None, *, ephemeral: bool = False):
+    async def send(
+        self, dest=None, *, content: str | None = None, ephemeral: bool = False
+    ):
         dest = dest or self.ctx
         channel = getattr(dest, "channel", dest)
         if hasattr(dest, "respond"):
@@ -29,9 +31,13 @@ class Embed(BaseEmbed):
             not hasattr(channel, "permissions_for")
             or channel.permissions_for(self.ctx.me).embed_links
         ):
-            return await method(embed=self)
+            return await method(content, embed=self)
         else:
-            return await method(self)
+            if content:
+                content = f"{content}\n{self}"
+            else:
+                content = self
+            return await method(content)
 
     def __str__(self) -> str:
         text = ""
