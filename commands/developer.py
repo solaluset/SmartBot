@@ -1,11 +1,38 @@
 import inspect
+from textwrap import TextWrapper
 
 import discord
 from discord import Activity, ActivityType, Status
 from discord.ext import commands
+from discord.ext.pages import Paginator
 
 from modules.utils import execute
 from modules.i18n import t
+
+
+class Splitter(TextWrapper):
+    def __init__(self, width: int):
+        super().__init__(width, replace_whitespace=False, tabsize=4)
+
+    def _split(self, text: str) -> list[str]:
+        return text.splitlines(True)
+
+    def _handle_long_word(
+        self,
+        reversed_chunks: list[str],
+        cur_line: list[str],
+        cur_len: int,
+        width: int,
+    ) -> None:
+        # split by words if possible
+        split_chunk = super()._split(reversed_chunks.pop())
+        split_chunk.reverse()
+        reversed_chunks.extend(split_chunk)
+        super()._handle_long_word(reversed_chunks, cur_line, cur_len, width)
+
+
+OUTPUT_FORMAT = "```\n\u200b{}\n```"
+_paginate = Splitter(2002 - len(OUTPUT_FORMAT)).wrap
 
 
 class DeveloperUtils(commands.Cog):
@@ -74,7 +101,11 @@ class DeveloperUtils(commands.Cog):
             last_author = None
 
         if result and not result.isspace():
-            await ctx.send(f"```\n{result}```")
+            pages = [OUTPUT_FORMAT.format(p) for p in _paginate(result)]
+            if len(pages) == 1:
+                await ctx.send(pages[0])
+            else:
+                await Paginator(pages).send(ctx)
         elif last_author != ctx.me:
             await ctx.send(t("exec.completed_without_output", ctx.language))
 
