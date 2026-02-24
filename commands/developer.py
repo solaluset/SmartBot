@@ -8,20 +8,23 @@ from modules.utils import execute
 from modules.i18n import t
 
 
-class OwnerUtils(commands.Cog):
+class DeveloperUtils(commands.Cog):
+    def __init__(self):
+        self._owner_check = commands.is_owner().predicate
+
+    async def cog_check(self, ctx):
+        return await self._owner_check(ctx)
+
     @commands.command(hidden=True)
-    @commands.is_owner()
     async def download(self, ctx, fname: str):
         await ctx.send(file=discord.File(fname))
 
     @commands.command(hidden=True)
-    @commands.is_owner()
     async def upload(self, ctx, fname: str):
         await ctx.message.attachments[0].save(fname)
         await ctx.send(t("upload.uploaded", ctx.language, name=fname))
 
     @commands.command(hidden=True)
-    @commands.is_owner()
     async def restart(self, ctx):
         await ctx.send(t("restart.restarting", ctx.language))
         with open("restart", "w") as f:
@@ -32,7 +35,6 @@ class OwnerUtils(commands.Cog):
         await ctx.bot.close()
 
     @commands.command(hidden=True, aliases=("rel",))
-    @commands.is_owner()
     async def reload(self, ctx, command: str):
         old_command = ctx.bot.get_command(command)
         if old_command is None:
@@ -51,7 +53,6 @@ class OwnerUtils(commands.Cog):
         await ctx.send(t("reload.success", ctx.language, command=old_command.name))
 
     @commands.command(hidden=True)
-    @commands.is_owner()
     async def exec(self, ctx, *, code: str):
         if code.startswith("```"):
             code = code.partition("\n")[2].rstrip("`")
@@ -78,7 +79,6 @@ class OwnerUtils(commands.Cog):
             await ctx.send(t("exec.completed_without_output", ctx.language))
 
     @commands.command(hidden=True)
-    @commands.is_owner()
     async def status(
         self,
         ctx,
@@ -102,4 +102,4 @@ class OwnerUtils(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(OwnerUtils())
+    bot.add_cog(DeveloperUtils())
