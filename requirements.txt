@@ -2,7 +2,7 @@
 py-cord[speed]==2.7.1
 aiohttp==3.13.3
 # database
-SQLAlchemy[asyncio]==2.0.47
+SQLAlchemy[asyncio]==2.0.48
 asyncpg==0.31.0
 ring==0.10.1
 # aliases
